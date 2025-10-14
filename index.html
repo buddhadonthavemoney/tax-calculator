@@ -177,7 +177,7 @@
 
         .summary-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
             gap: 1rem;
             margin-bottom: 2rem;
         }
@@ -197,7 +197,7 @@
         }
         
         .summary-card p {
-            font-size: 1.5rem;
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
             font-weight: 600;
             color: var(--primary-color);
         }
@@ -343,6 +343,16 @@
             .container { padding: 1.5rem; }
             .form-grid { grid-template-columns: 1fr; }
             header h1 { font-size: 1.75rem; }
+        }
+
+        @media (min-width: 992px) {
+            .container {
+                max-width: 960px;
+            }
+            .summary-grid {
+                /* Force 5 columns on wider screens */
+                grid-template-columns: repeat(5, 1fr);
+            }
         }
 
     </style>
@@ -723,12 +733,12 @@
             function displayResults(results) {
                 const resultsSection = document.getElementById('results');
 
-                // Populate summary
-                document.getElementById('summary-gross-income').textContent = `NPR ${formatNPR(results.grossAnnualIncome)}`;
-                document.getElementById('summary-total-exemptions').textContent = `NPR ${formatNPR(results.totalExemptions)}`;
-                document.getElementById('summary-taxable-income').textContent = `NPR ${formatNPR(results.taxableIncome)}`;
-                document.getElementById('summary-total-tax').textContent = `NPR ${formatNPR(results.totalTax)}`;
-                document.getElementById('summary-monthly-tax').textContent = `NPR ${formatNPR(results.monthlyTax)}`;
+                // Populate summary - Use non-breaking space (&nbsp;) to keep currency and amount together
+                document.getElementById('summary-gross-income').innerHTML = `NPR&nbsp;${formatNPR(results.grossAnnualIncome)}`;
+                document.getElementById('summary-total-exemptions').innerHTML = `NPR&nbsp;${formatNPR(results.totalExemptions)}`;
+                document.getElementById('summary-taxable-income').innerHTML = `NPR&nbsp;${formatNPR(results.taxableIncome)}`;
+                document.getElementById('summary-total-tax').innerHTML = `NPR&nbsp;${formatNPR(results.totalTax)}`;
+                document.getElementById('summary-monthly-tax').innerHTML = `NPR&nbsp;${formatNPR(results.monthlyTax)}`;
 
                 // Populate breakdown table
                 const breakdownBody = document.getElementById('breakdown-body');
@@ -765,4 +775,7 @@
     </script>
 </body>
 </html>
+
+
+
 
