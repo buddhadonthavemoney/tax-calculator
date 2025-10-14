@@ -107,18 +107,17 @@
             align-items: center;
             gap: 0.5rem;
         }
-        
-        .input-with-toggle input[type="number"] {
-            flex: 1 1 auto;
-            min-width: 0;
-        }
 
+        .input-with-toggle input {
+            flex-grow: 1;
+        }
+        
         .toggle-group {
             display: flex;
             border: 1px solid var(--border-color);
             border-radius: var(--border-radius);
             overflow: hidden;
-            flex-shrink: 0; 
+            flex-shrink: 0;
         }
 
         .toggle-group label {
@@ -128,7 +127,7 @@
             background-color: #f1f3f5;
             font-size: 0.85rem;
             transition: background-color 0.2s;
-            white-space: nowrap; 
+            white-space: nowrap;
         }
 
         .toggle-group input[type="radio"] {
@@ -244,6 +243,13 @@
             margin-bottom: 0.5rem;
         }
         
+        #suggestions li.suggestion-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+
+        /* INFO SECTION STYLES */
         #info-section {
             margin-top: 3rem;
             border-top: 1px solid var(--border-color);
@@ -337,7 +343,7 @@
             background-color: #f1f3f5;
             font-weight: 500;
         }
-
+        
         @media (max-width: 768px) {
             body { padding: 1rem; }
             .container { padding: 1.5rem; }
@@ -345,13 +351,9 @@
             header h1 { font-size: 1.75rem; }
         }
 
-        @media (min-width: 992px) {
+        @media (min-width: 1200px) {
             .container {
-                max-width: 960px;
-            }
-            .summary-grid {
-                /* Force 5 columns on wider screens */
-                grid-template-columns: repeat(5, 1fr);
+                max-width: 1100px; /* Widen container on large screens */
             }
         }
 
@@ -492,7 +494,7 @@
             </div>
         </section>
 
-        <!-- NEW INFO SECTION -->
+        <!-- INFO SECTION -->
         <section id="info-section">
             <details>
                 <summary>Learn About Nepal's Income Tax Rules (FY 2081/82)</summary>
@@ -617,14 +619,8 @@
             
             function handleFormSubmit(event) {
                 event.preventDefault();
-                
-                // 1. Get User Inputs
                 const inputs = getInputs();
-
-                // 2. Perform Calculations
                 const results = calculateTax(inputs);
-
-                // 3. Display Results
                 displayResults(results);
             }
 
@@ -655,10 +651,9 @@
                 
                 // Retirement Fund Calculation
                 const getAnnualContribution = (amount, period) => period === 'monthly' ? amount * 12 : amount;
-                const annualPF = getAnnualContribution(inputs.pfContribution, inputs.pfPeriod);
-                const annualCIT = getAnnualContribution(inputs.citContribution, inputs.citPeriod);
-                const annualSSF = getAnnualContribution(inputs.ssfContribution, inputs.ssfPeriod);
-                const totalRetirementContribution = annualPF + annualCIT + annualSSF;
+                const totalRetirementContribution = getAnnualContribution(inputs.pfContribution, inputs.pfPeriod) +
+                                                 getAnnualContribution(inputs.citContribution, inputs.citPeriod) +
+                                                 getAnnualContribution(inputs.ssfContribution, inputs.ssfPeriod);
                 
                 // Exemption Calculation
                 const retirementExemption = Math.min(
@@ -699,24 +694,61 @@
                     }
                 }
                 
-                const monthlyTax = totalTax / 12;
-
                 // Suggestions
                 const suggestions = [];
-                const remainingRetirement = CONSTANTS.MAX_RETIREMENT_DEDUCTION - retirementExemption;
-                if (remainingRetirement > 0) {
-                    suggestions.push(`You can contribute NPR ${formatNPR(remainingRetirement)} more to retirement funds (PF, CIT, SSF) to maximize tax savings.`);
+                const maxPossibleRetirementExemption = Math.min(grossAnnualIncome / 3, CONSTANTS.MAX_RETIREMENT_DEDUCTION);
+                const remainingRetirementPotential = maxPossibleRetirementExemption - totalRetirementContribution;
+                
+                if (remainingRetirementPotential > 0) {
+                    suggestions.push({
+                        text: `You can contribute NPR ${formatNPR(remainingRetirementPotential)} more to retirement funds (PF, CIT, SSF) to maximize your tax savings.`,
+                        type: 'tip'
+                    });
+                } else if (totalRetirementContribution > maxPossibleRetirementExemption) {
+                    const overContribution = totalRetirementContribution - maxPossibleRetirementExemption;
+                     suggestions.push({
+                        text: `You have contributed NPR ${formatNPR(overContribution)} more to retirement funds than the deductible limit. This extra amount provides no additional tax benefits.`,
+                        type: 'warning'
+                    });
                 }
-                const remainingLifeInsurance = CONSTANTS.MAX_LIFE_INSURANCE_DEDUCTION - lifeInsuranceExemption;
-                 if (remainingLifeInsurance > 0) {
-                    suggestions.push(`You can claim up to NPR ${formatNPR(remainingLifeInsurance)} more on Life Insurance premiums.`);
+                
+                const lifeInsuranceOver = inputs.lifeInsurance - CONSTANTS.MAX_LIFE_INSURANCE_DEDUCTION;
+                if (lifeInsuranceOver > 0) {
+                     suggestions.push({
+                        text: `Your Life Insurance premium of NPR ${formatNPR(inputs.lifeInsurance)} exceeds the NPR ${formatNPR(CONSTANTS.MAX_LIFE_INSURANCE_DEDUCTION)} limit. NPR ${formatNPR(lifeInsuranceOver)} is not tax-deductible.`,
+                        type: 'warning'
+                    });
+                } else {
+                    const remainingLifeInsurance = CONSTANTS.MAX_LIFE_INSURANCE_DEDUCTION - inputs.lifeInsurance;
+                    if (remainingLifeInsurance > 0) {
+                        suggestions.push({
+                            text: `You can claim up to NPR ${formatNPR(remainingLifeInsurance)} more on Life Insurance premiums.`,
+                            type: 'tip'
+                        });
+                    }
                 }
-                const remainingMedicalInsurance = CONSTANTS.MAX_MEDICAL_INSURANCE_DEDUCTION - medicalInsuranceExemption;
-                 if (remainingMedicalInsurance > 0) {
-                    suggestions.push(`You can claim up to NPR ${formatNPR(remainingMedicalInsurance)} more on Medical Insurance premiums.`);
+                
+                const medicalInsuranceOver = inputs.medicalInsurance - CONSTANTS.MAX_MEDICAL_INSURANCE_DEDUCTION;
+                if(medicalInsuranceOver > 0) {
+                     suggestions.push({
+                        text: `Your Medical Insurance premium of NPR ${formatNPR(inputs.medicalInsurance)} exceeds the NPR ${formatNPR(CONSTANTS.MAX_MEDICAL_INSURANCE_DEDUCTION)} limit. NPR ${formatNPR(medicalInsuranceOver)} is not tax-deductible.`,
+                        type: 'warning'
+                    });
+                } else {
+                    const remainingMedicalInsurance = CONSTANTS.MAX_MEDICAL_INSURANCE_DEDUCTION - inputs.medicalInsurance;
+                    if (remainingMedicalInsurance > 0) {
+                        suggestions.push({
+                            text: `You can claim up to NPR ${formatNPR(remainingMedicalInsurance)} more on Medical Insurance premiums.`,
+                            type: 'tip'
+                        });
+                    }
                 }
+
                 if (suggestions.length === 0) {
-                    suggestions.push("You're doing a great job at maximizing your tax exemptions!");
+                    suggestions.push({
+                        text: "You're doing a great job at maximizing your tax exemptions!",
+                        type: 'tip'
+                    });
                 }
 
                 return {
@@ -724,7 +756,7 @@
                     totalExemptions,
                     taxableIncome,
                     totalTax,
-                    monthlyTax,
+                    monthlyTax: totalTax / 12,
                     taxBreakdown,
                     suggestions
                 };
@@ -733,7 +765,7 @@
             function displayResults(results) {
                 const resultsSection = document.getElementById('results');
 
-                // Populate summary - Use non-breaking space (&nbsp;) to keep currency and amount together
+                // Populate summary
                 document.getElementById('summary-gross-income').innerHTML = `NPR&nbsp;${formatNPR(results.grossAnnualIncome)}`;
                 document.getElementById('summary-total-exemptions').innerHTML = `NPR&nbsp;${formatNPR(results.totalExemptions)}`;
                 document.getElementById('summary-taxable-income').innerHTML = `NPR&nbsp;${formatNPR(results.taxableIncome)}`;
@@ -757,9 +789,12 @@
                 // Populate suggestions
                 const suggestionsList = document.getElementById('suggestions-list');
                 suggestionsList.innerHTML = '';
-                results.suggestions.forEach(text => {
+                results.suggestions.forEach(suggestion => {
                    const li = document.createElement('li');
-                   li.textContent = text;
+                   li.textContent = suggestion.text;
+                   if (suggestion.type === 'warning') {
+                       li.classList.add('suggestion-warning');
+                   }
                    suggestionsList.appendChild(li);
                 });
 
@@ -775,7 +810,4 @@
     </script>
 </body>
 </html>
-
-
-
 
