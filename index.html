@@ -199,6 +199,7 @@
             font-size: clamp(1.2rem, 4vw, 1.5rem);
             font-weight: 600;
             color: var(--primary-color);
+            white-space: nowrap;
         }
 
         h2 {
@@ -211,23 +212,19 @@
         .breakdown-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 2rem;
+            margin-bottom: 0; /* Margin moved to wrapper */
         }
         
         .breakdown-table th, .breakdown-table td {
             padding: 0.85rem 1rem;
-            text-align: left;
+            text-align: center; /* Changed from left */
             border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
         }
         
         .breakdown-table th {
             font-weight: 500;
             background-color: #f1f3f5;
-        }
-        
-        .breakdown-table td:nth-child(2),
-        .breakdown-table td:nth-child(4) {
-             text-align: right;
         }
         
         #suggestions ul {
@@ -248,6 +245,12 @@
             color: #856404;
         }
 
+        /* NEW: Wrapper for scrollable tables */
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-bottom: 2rem;
+        }
 
         /* INFO SECTION STYLES */
         #info-section {
@@ -329,14 +332,15 @@
         .info-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 1.5rem;
+            margin-bottom: 0; /* Margin moved to wrapper */
             font-size: 0.9rem;
         }
 
         .info-table th, .info-table td {
             padding: 0.75rem 1rem;
-            text-align: left;
+            text-align: center; /* Changed from left */
             border: 1px solid var(--border-color);
+            white-space: nowrap;
         }
 
         .info-table th {
@@ -470,19 +474,22 @@
             <!-- Tax Breakdown -->
             <div>
                 <h2>Tax Slab Breakdown</h2>
-                <table class="breakdown-table">
-                    <thead>
-                        <tr>
-                            <th>Tax Slab (NPR)</th>
-                            <th>Taxable Amount</th>
-                            <th>Rate</th>
-                            <th>Tax</th>
-                        </tr>
-                    </thead>
-                    <tbody id="breakdown-body">
-                        <!-- Rows will be injected by JavaScript -->
-                    </tbody>
-                </table>
+                <!-- NEW: Table wrapper -->
+                <div class="table-wrapper">
+                    <table class="breakdown-table">
+                        <thead>
+                            <tr>
+                                <th>Tax Slab (NPR)</th>
+                                <th>Taxable Amount</th>
+                                <th>Rate</th>
+                                <th>Tax</th>
+                            </tr>
+                        </thead>
+                        <tbody id="breakdown-body">
+                            <!-- Rows will be injected by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- Suggestions -->
@@ -503,68 +510,74 @@
                     <p>Nepal's tax system is progressive, meaning the tax rate increases as your income increases. Here are the rates for salaried individuals.</p>
                     
                     <h4>For Individuals (Unmarried)</h4>
-                    <table class="info-table">
-                        <thead>
-                            <tr>
-                                <th>Taxable Income Slab (NPR)</th>
-                                <th>Tax Rate</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>First 500,000</td>
-                                <td>1% (Social Security Tax)</td>
-                            </tr>
-                            <tr>
-                                <td>Next 200,000 (500,001 to 700,000)</td>
-                                <td>10%</td>
-                            </tr>
-                            <tr>
-                                <td>Next 300,000 (700,001 to 1,000,000)</td>
-                                <td>20%</td>
-                            </tr>
-                            <tr>
-                                <td>Next 1,000,000 (1,000,001 to 2,000,000)</td>
-                                <td>30%</td>
-                            </tr>
-                            <tr>
-                                <td>Above 2,000,000</td>
-                                <td>36%</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <!-- NEW: Table wrapper -->
+                    <div class="table-wrapper">
+                        <table class="info-table">
+                            <thead>
+                                <tr>
+                                    <th>Taxable Income Slab (NPR)</th>
+                                    <th>Tax Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>First 500,000</td>
+                                    <td>1% (Social Security Tax)</td>
+                                </tr>
+                                <tr>
+                                    <td>Next 200,000 (500,001 to 700,000)</td>
+                                    <td>10%</td>
+                                </tr>
+                                <tr>
+                                    <td>Next 300,000 (700,001 to 1,000,000)</td>
+                                    <td>20%</td>
+                                </tr>
+                                <tr>
+                                    <td>Next 1,000,000 (1,000,001 to 2,000,000)</td>
+                                    <td>30%</td>
+                                </tr>
+                                <tr>
+                                    <td>Above 2,000,000</td>
+                                    <td>36%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
 
                     <h4>For Couples (Married)</h4>
-                    <table class="info-table">
-                         <thead>
-                            <tr>
-                                <th>Taxable Income Slab (NPR)</th>
-                                <th>Tax Rate</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>First 600,000</td>
-                                <td>1% (Social Security Tax)</td>
-                            </tr>
-                            <tr>
-                                <td>Next 200,000 (600,001 to 800,000)</td>
-                                <td>10%</td>
-                            </tr>
-                            <tr>
-                                <td>Next 300,000 (800,001 to 1,100,000)</td>
-                                <td>20%</td>
-                            </tr>
-                             <tr>
-                                <td>Next 900,000 (1,100,001 to 2,000,000)</td>
-                                <td>30%</td>
-                            </tr>
-                            <tr>
-                                <td>Above 2,000,000</td>
-                                <td>36%</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <!-- NEW: Table wrapper -->
+                    <div class="table-wrapper">
+                        <table class="info-table">
+                             <thead>
+                                <tr>
+                                    <th>Taxable Income Slab (NPR)</th>
+                                    <th>Tax Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>First 600,000</td>
+                                    <td>1% (Social Security Tax)</td>
+                                </tr>
+                                <tr>
+                                    <td>Next 200,000 (600,001 to 800,000)</td>
+                                    <td>10%</td>
+                                </tr>
+                                <tr>
+                                    <td>Next 300,000 (800,001 to 1,100,000)</td>
+                                    <td>20%</td>
+                                </tr>
+                                 <tr>
+                                    <td>Next 900,000 (1,100,001 to 2,000,000)</td>
+                                    <td>30%</td>
+                                </tr>
+                                <tr>
+                                    <td>Above 2,000,000</td>
+                                    <td>36%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
 
                      <h3>Major Exemptions and Deductions</h3>
                      <p>You can reduce your taxable income by claiming the following deductions. The calculator automatically applies these limits.</p>
@@ -779,9 +792,9 @@
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${item.label}</td>
-                        <td style="text-align: right;">${formatNPR(item.amount)}</td>
+                        <td style="text-align: center;">${formatNPR(item.amount)}</td>
                         <td>${item.rate.toFixed(2)}%</td>
-                        <td style="text-align: right;">${formatNPR(item.tax)}</td>
+                        <td style="text-align: center;">${formatNPR(item.tax)}</td>
                     `;
                     breakdownBody.appendChild(row);
                 });
