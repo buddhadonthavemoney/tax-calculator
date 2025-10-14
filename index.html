@@ -3,7 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nepal Income Tax Calculator</title>
+    
+    <!-- SEO: Optimized Title -->
+    <title>Nepal Income Tax Calculator | FY 2081/82 (2024/25)</title>
+
+    <!-- SEO: Meta Description -->
+    <meta name="description" content="Calculate your annual income tax in Nepal for the fiscal year 2081/82 (2024/25). A simple, free tool to understand your tax liability based on the latest slabs, exemptions, PF, CIT, and insurance.">
+
+    <!-- SEO: Keywords -->
+    <meta name="keywords" content="nepal income tax calculator, tax calculator nepal, income tax nepal, fy 2081/82, tax slabs nepal, provident fund, cit, ssf, tax exemptions">
+
+    <!-- SEO: Canonical URL (Replace with your final domain) -->
+    <link rel="canonical" href="https://tax.buddhag.com.np/">
+
+    <!-- SEO: Social Media (Open Graph) Tags (Replace with your details) -->
+    <meta property="og:title" content="Nepal Income Tax Calculator | FY 2081/82">
+    <meta property="og:description" content="Instantly calculate your income tax in Nepal based on the latest tax slabs and deduction rules.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://tax.buddhag.com.np/">
+    <!-- <meta property="og:image" content="https://your-domain.pages.dev/social-preview.png"> You can add a preview image -->
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -63,6 +82,16 @@
         header p {
             color: var(--text-light-color);
             font-size: 0.95rem;
+        }
+
+        /* SEO: Added intro paragraph style */
+        .intro-text {
+            text-align: center;
+            color: var(--text-light-color);
+            margin-bottom: 2.5rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .form-grid {
@@ -212,12 +241,12 @@
         .breakdown-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 0; /* Margin moved to wrapper */
+            margin-bottom: 0;
         }
         
         .breakdown-table th, .breakdown-table td {
             padding: 0.85rem 1rem;
-            text-align: center; /* Changed from left */
+            text-align: center;
             border-bottom: 1px solid var(--border-color);
             white-space: nowrap;
         }
@@ -245,14 +274,12 @@
             color: #856404;
         }
 
-        /* NEW: Wrapper for scrollable tables */
         .table-wrapper {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             margin-bottom: 2rem;
         }
 
-        /* INFO SECTION STYLES */
         #info-section {
             margin-top: 3rem;
             border-top: 1px solid var(--border-color);
@@ -264,7 +291,7 @@
             font-weight: 600;
             color: var(--primary-color);
             cursor: pointer;
-            list-style: none; /* Remove default marker */
+            list-style: none;
             position: relative;
             padding-left: 1.5rem;
             transition: color 0.2s;
@@ -332,13 +359,13 @@
         .info-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 0; /* Margin moved to wrapper */
+            margin-bottom: 0;
             font-size: 0.9rem;
         }
 
         .info-table th, .info-table td {
             padding: 0.75rem 1rem;
-            text-align: center; /* Changed from left */
+            text-align: center;
             border: 1px solid var(--border-color);
             white-space: nowrap;
         }
@@ -357,11 +384,41 @@
 
         @media (min-width: 1200px) {
             .container {
-                max-width: 1100px; /* Widen container on large screens */
+                max-width: 1100px;
             }
         }
 
     </style>
+
+    <!-- SEO: JSON-LD Structured Data for FAQ Rich Snippets -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [{
+        "@type": "Question",
+        "name": "What are the income tax slabs in Nepal for FY 2081/82?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "For unmarried individuals, the tax slabs are: 1% on the first NPR 500,000, 10% on the next 200,000, 20% on the next 300,000, 30% on the next 1,000,000, and 36% on income above 2,000,000. For married couples, the first slab is 1% on NPR 600,000."
+        }
+      },{
+        "@type": "Question",
+        "name": "What is the maximum tax deduction for retirement funds in Nepal?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The maximum tax deduction for contributions to approved retirement funds (like PF, CIT, SSF) is the lowest of: your actual contribution, one-third of your gross income, or a maximum cap of NPR 500,000 per year."
+        }
+      },{
+        "@type": "Question",
+        "name": "How much can I claim for life and medical insurance in Nepal?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "You can claim a tax deduction for up to NPR 40,000 per year for life insurance premiums and up to NPR 20,000 per year for medical insurance premiums."
+        }
+      }]
+    }
+    </script>
 </head>
 <body>
 
@@ -371,8 +428,13 @@
             <p>For Fiscal Year 2081/82 (2024/25)</p>
         </header>
 
+        <!-- SEO: Added intro paragraph -->
+        <p class="intro-text">
+            Use this tool to calculate your salary tax in Nepal for the fiscal year 2081/82. Enter your income and deduction details to see the breakdown of your tax liability based on the latest official slabs.
+        </p>
+
         <form id="tax-form" class="form-grid">
-            <!-- Basic Information -->
+            <!-- Form fields remain the same -->
             <div class="form-group">
                 <label for="marital-status">Marital Status</label>
                 <select id="marital-status">
@@ -385,13 +447,11 @@
                 <input type="number" id="monthly-salary" placeholder="e.g., 80000" min="0" required>
             </div>
             
-            <!-- Additional Income -->
-             <div class="form-group full-width">
+            <div class="form-group full-width">
                 <label for="annual-bonus">Annual Bonus / Other Income (NPR)</label>
                 <input type="number" id="annual-bonus" placeholder="e.g., 80000" min="0">
             </div>
 
-            <!-- Retirement Contributions -->
             <div class="form-group">
                 <label for="pf-contribution">Provident Fund (PF/EPF)</label>
                 <div class="input-with-toggle">
@@ -429,7 +489,6 @@
                 </div>
             </div>
 
-            <!-- Insurance & Other Deductions (Annual) -->
             <div class="form-group">
                 <label for="life-insurance">Life Insurance Premium (Annual)</label>
                 <input type="number" id="life-insurance" placeholder="e.g., 25000" min="0">
@@ -474,7 +533,6 @@
             <!-- Tax Breakdown -->
             <div>
                 <h2>Tax Slab Breakdown</h2>
-                <!-- NEW: Table wrapper -->
                 <div class="table-wrapper">
                     <table class="breakdown-table">
                         <thead>
@@ -485,9 +543,7 @@
                                 <th>Tax</th>
                             </tr>
                         </thead>
-                        <tbody id="breakdown-body">
-                            <!-- Rows will be injected by JavaScript -->
-                        </tbody>
+                        <tbody id="breakdown-body"></tbody>
                     </table>
                 </div>
             </div>
@@ -495,9 +551,7 @@
             <!-- Suggestions -->
             <div id="suggestions">
                 <h2>Tax Optimization Suggestions</h2>
-                <ul id="suggestions-list">
-                    <!-- Suggestions will be injected by JavaScript -->
-                </ul>
+                <ul id="suggestions-list"></ul>
             </div>
         </section>
 
@@ -510,7 +564,6 @@
                     <p>Nepal's tax system is progressive, meaning the tax rate increases as your income increases. Here are the rates for salaried individuals.</p>
                     
                     <h4>For Individuals (Unmarried)</h4>
-                    <!-- NEW: Table wrapper -->
                     <div class="table-wrapper">
                         <table class="info-table">
                             <thead>
@@ -545,7 +598,6 @@
                     </div>
 
                     <h4>For Couples (Married)</h4>
-                    <!-- NEW: Table wrapper -->
                     <div class="table-wrapper">
                         <table class="info-table">
                              <thead>
@@ -601,10 +653,9 @@
                 </div>
             </details>
         </section>
-
     </div>
-
     <script>
+        // JS logic remains the same
         document.addEventListener('DOMContentLoaded', () => {
             const form = document.getElementById('tax-form');
             form.addEventListener('submit', handleFormSubmit);
@@ -792,9 +843,9 @@
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${item.label}</td>
-                        <td style="text-align: center;">${formatNPR(item.amount)}</td>
+                        <td>${formatNPR(item.amount)}</td>
                         <td>${item.rate.toFixed(2)}%</td>
-                        <td style="text-align: center;">${formatNPR(item.tax)}</td>
+                        <td>${formatNPR(item.tax)}</td>
                     `;
                     breakdownBody.appendChild(row);
                 });
