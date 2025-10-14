@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nepal Income Tax Calculator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --surface-color: #ffffff;
+            --primary-color: #4a90e2;
+            --text-color: #333;
+            --text-light-color: #666;
+            --border-color: #dee2e6;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --border-radius: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: var(--surface-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 2.5rem;
+            transition: all 0.3s ease-in-out;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        header p {
+            color: var(--text-light-color);
+            font-size: 0.95rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+        }
+        
+        .input-with-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .toggle-group {
+            display: flex;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .toggle-group label {
+            margin: 0;
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            background-color: #f1f3f5;
+            font-size: 0.85rem;
+            transition: background-color 0.2s;
+        }
+
+        .toggle-group input[type="radio"] {
+            display: none;
+        }
+
+        .toggle-group input[type="radio"]:checked + label {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 500;
+        }
+
+        .calculate-btn {
+            grid-column: 1 / -1;
+            padding: 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+            margin-top: 1.5rem;
+        }
+
+        .calculate-btn:hover {
+            background-color: #3a7ac8;
+            transform: translateY(-2px);
+        }
+
+        #results {
+            margin-top: 2.5rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            max-height: 0;
+            overflow: hidden;
+        }
+        
+        #results.visible {
+            opacity: 1;
+            transform: translateY(0);
+            max-height: 2000px; /* Large enough to not clip content */
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            background-color: var(--bg-color);
+            padding: 1.25rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+
+        .summary-card h3 {
+            font-size: 0.9rem;
+            color: var(--text-light-color);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .summary-card p {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        h2 {
+            font-weight: 600;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .breakdown-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+        }
+        
+        .breakdown-table th, .breakdown-table td {
+            padding: 0.85rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .breakdown-table th {
+            font-weight: 500;
+            background-color: #f1f3f5;
+        }
+        
+        .breakdown-table td:nth-child(2),
+        .breakdown-table td:nth-child(4) {
+             text-align: right;
+        }
+        
+        #suggestions ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        #suggestions li {
+            background-color: #e9f7eb;
+            color: #155724;
+            padding: 0.85rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 0.5rem;
+        }
+
+        /* NEW STYLES FOR INFO SECTION */
+        #info-section {
+            margin-top: 3rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 2rem;
+        }
+
+        #info-section summary {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            cursor: pointer;
+            list-style: none; /* Remove default marker */
+            position: relative;
+            padding-left: 1.5rem;
+            transition: color 0.2s;
+        }
+        
+        #info-section summary:hover {
+            color: #3a7ac8;
+        }
+
+        #info-section summary::before {
+            content: '▶';
+            position: absolute;
+            left: 0;
+            font-size: 0.8rem;
+            transition: transform 0.2s ease-in-out;
+            top: 50%;
+            transform: translateY(-50%) rotate(0deg);
+        }
+
+        #info-section details[open] > summary::before {
+            transform: translateY(-50%) rotate(90deg);
+        }
+
+        .info-content {
+            padding-top: 1.5rem;
+            color: var(--text-light-color);
+        }
+
+        .info-content h3 {
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+            font-weight: 600;
+            border: none;
+            padding: 0;
+        }
+        
+        .info-content h4 {
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .info-content p, .info-content li {
+            margin-bottom: 1rem;
+        }
+
+        .info-content ul {
+            list-style-type: none;
+            padding-left: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .info-content li {
+            background-color: var(--bg-color);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--primary-color);
+            margin-bottom: 0;
+        }
+
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .info-table th, .info-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border: 1px solid var(--border-color);
+        }
+
+        .info-table th {
+            background-color: #f1f3f5;
+            font-weight: 500;
+        }
+        /* END OF NEW STYLES */
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .container { padding: 1.5rem; }
+            .form-grid { grid-template-columns: 1fr; }
+            header h1 { font-size: 1.75rem; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Nepal Income Tax Calculator</h1>
+            <p>For Fiscal Year 2081/82 (2024/25)</p>
+        </header>
+
+        <form id="tax-form" class="form-grid">
+            <!-- Basic Information -->
+            <div class="form-group">
+                <label for="marital-status">Marital Status</label>
+                <select id="marital-status">
+                    <option value="single">Single</option>
+                    <option value="married">Married</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="monthly-salary">Monthly Salary (NPR)</label>
+                <input type="number" id="monthly-salary" placeholder="e.g., 80000" min="0" required>
+            </div>
+            
+            <!-- Additional Income -->
+             <div class="form-group full-width">
+                <label for="annual-bonus">Annual Bonus / Other Income (NPR)</label>
+                <input type="number" id="annual-bonus" placeholder="e.g., 80000" min="0">
+            </div>
+
+            <!-- Retirement Contributions -->
+            <div class="form-group">
+                <label for="pf-contribution">Provident Fund (PF/EPF)</label>
+                <div class="input-with-toggle">
+                    <input type="number" id="pf-contribution" placeholder="e.g., 8000" min="0">
+                    <div class="toggle-group">
+                        <input type="radio" id="pf-monthly" name="pf-period" value="monthly" checked>
+                        <label for="pf-monthly">Monthly</label>
+                        <input type="radio" id="pf-yearly" name="pf-period" value="yearly">
+                        <label for="pf-yearly">Yearly</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="cit-contribution">Citizen Investment Trust (CIT)</label>
+                 <div class="input-with-toggle">
+                    <input type="number" id="cit-contribution" placeholder="0" min="0">
+                     <div class="toggle-group">
+                        <input type="radio" id="cit-monthly" name="cit-period" value="monthly" checked>
+                        <label for="cit-monthly">Monthly</label>
+                        <input type="radio" id="cit-yearly" name="cit-period" value="yearly">
+                        <label for="cit-yearly">Yearly</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="ssf-contribution">Social Security Fund (SSF)</label>
+                 <div class="input-with-toggle">
+                    <input type="number" id="ssf-contribution" placeholder="0" min="0">
+                     <div class="toggle-group">
+                        <input type="radio" id="ssf-monthly" name="ssf-period" value="monthly" checked>
+                        <label for="ssf-monthly">Monthly</label>
+                        <input type="radio" id="ssf-yearly" name="ssf-period" value="yearly">
+                        <label for="ssf-yearly">Yearly</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Insurance & Other Deductions (Annual) -->
+            <div class="form-group">
+                <label for="life-insurance">Life Insurance Premium (Annual)</label>
+                <input type="number" id="life-insurance" placeholder="e.g., 25000" min="0">
+            </div>
+            <div class="form-group">
+                <label for="medical-insurance">Medical Insurance Premium (Annual)</label>
+                <input type="number" id="medical-insurance" placeholder="e.g., 15000" min="0">
+            </div>
+             <div class="form-group">
+                <label for="other-deductions">Other Deductions (Annual)</label>
+                <input type="number" id="other-deductions" placeholder="0" min="0">
+            </div>
+            
+            <button type="submit" class="calculate-btn">Calculate My Tax</button>
+        </form>
+
+        <section id="results">
+            <!-- Summary Cards -->
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <h3>Gross Annual Income</h3>
+                    <p id="summary-gross-income">NPR 0</p>
+                </div>
+                <div class="summary-card">
+                    <h3>Total Exemptions</h3>
+                    <p id="summary-total-exemptions">NPR 0</p>
+                </div>
+                <div class="summary-card">
+                    <h3>Taxable Income</h3>
+                    <p id="summary-taxable-income">NPR 0</p>
+                </div>
+                <div class="summary-card">
+                    <h3>Total Annual Tax</h3>
+                    <p id="summary-total-tax">NPR 0</p>
+                </div>
+            </div>
+
+            <!-- Tax Breakdown -->
+            <div>
+                <h2>Tax Slab Breakdown</h2>
+                <table class="breakdown-table">
+                    <thead>
+                        <tr>
+                            <th>Tax Slab (NPR)</th>
+                            <th>Taxable Amount</th>
+                            <th>Rate</th>
+                            <th>Tax</th>
+                        </tr>
+                    </thead>
+                    <tbody id="breakdown-body">
+                        <!-- Rows will be injected by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Suggestions -->
+            <div id="suggestions">
+                <h2>Tax Optimization Suggestions</h2>
+                <ul id="suggestions-list">
+                    <!-- Suggestions will be injected by JavaScript -->
+                </ul>
+            </div>
+        </section>
+
+        <!-- NEW INFO SECTION -->
+        <section id="info-section">
+            <details>
+                <summary>Learn About Nepal's Income Tax Rules (FY 2081/82)</summary>
+                <div class="info-content">
+                    <h3>Income Tax Slabs</h3>
+                    <p>Nepal's tax system is progressive, meaning the tax rate increases as your income increases. Here are the rates for salaried individuals.</p>
+                    
+                    <h4>For Individuals (Unmarried)</h4>
+                    <table class="info-table">
+                        <thead>
+                            <tr>
+                                <th>Taxable Income Slab (NPR)</th>
+                                <th>Tax Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>First 500,000</td>
+                                <td>1% (Social Security Tax)</td>
+                            </tr>
+                            <tr>
+                                <td>Next 200,000 (500,001 to 700,000)</td>
+                                <td>10%</td>
+                            </tr>
+                            <tr>
+                                <td>Next 300,000 (700,001 to 1,000,000)</td>
+                                <td>20%</td>
+                            </tr>
+                            <tr>
+                                <td>Next 1,000,000 (1,000,001 to 2,000,000)</td>
+                                <td>30%</td>
+                            </tr>
+                            <tr>
+                                <td>Above 2,000,000</td>
+                                <td>36%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>For Couples (Married)</h4>
+                    <table class="info-table">
+                         <thead>
+                            <tr>
+                                <th>Taxable Income Slab (NPR)</th>
+                                <th>Tax Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>First 600,000</td>
+                                <td>1% (Social Security Tax)</td>
+                            </tr>
+                            <tr>
+                                <td>Next 200,000 (600,001 to 800,000)</td>
+                                <td>10%</td>
+                            </tr>
+                            <tr>
+                                <td>Next 300,000 (800,001 to 1,100,000)</td>
+                                <td>20%</td>
+                            </tr>
+                             <tr>
+                                <td>Next 900,000 (1,100,001 to 2,000,000)</td>
+                                <td>30%</td>
+                            </tr>
+                            <tr>
+                                <td>Above 2,000,000</td>
+                                <td>36%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                     <h3>Major Exemptions and Deductions</h3>
+                     <p>You can reduce your taxable income by claiming the following deductions. The calculator automatically applies these limits.</p>
+                     <ul>
+                        <li>
+                            <h4>Retirement Fund Contribution</h4>
+                            Contributions to approved funds like Provident Fund (PF/EPF), Citizen Investment Trust (CIT), and Social Security Fund (SSF) are deductible. The maximum deduction is the <strong>lowest</strong> of:
+                            <br> a) Actual contribution amount
+                            <br> b) One-third (1/3rd) of your gross annual income
+                            <br> c) <strong>NPR 500,000</strong>
+                        </li>
+                        <li>
+                            <h4>Life Insurance Premium</h4>
+                            You can claim a deduction for the premium paid on your life insurance policy, up to a maximum of <strong>NPR 40,000</strong> per year.
+                        </li>
+                        <li>
+                            <h4>Medical Insurance Premium</h4>
+                             You can claim a deduction for health insurance premiums paid for yourself or your family, up to a maximum of <strong>NPR 20,000</strong> per year.
+                        </li>
+                     </ul>
+                </div>
+            </details>
+        </section>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('tax-form');
+            form.addEventListener('submit', handleFormSubmit);
+
+            // TAX CONSTANTS for FY 2081/82
+            const CONSTANTS = {
+                MAX_RETIREMENT_DEDUCTION: 500000,
+                MAX_LIFE_INSURANCE_DEDUCTION: 40000,
+                MAX_MEDICAL_INSURANCE_DEDUCTION: 20000,
+                SLABS_SINGLE: [
+                    { amount: 500000, rate: 0.01, label: "First 5,00,000" },
+                    { amount: 200000, rate: 0.10, label: "Next 2,00,000" },
+                    { amount: 300000, rate: 0.20, label: "Next 3,00,000" },
+                    { amount: 1000000, rate: 0.30, label: "Next 10,00,000" },
+                    { amount: Infinity, rate: 0.36, label: "Above 20,00,000" }
+                ],
+                SLABS_MARRIED: [
+                    { amount: 600000, rate: 0.01, label: "First 6,00,000" },
+                    { amount: 200000, rate: 0.10, label: "Next 2,00,000" },
+                    { amount: 300000, rate: 0.20, label: "Next 3,00,000" },
+                    { amount: 900000, rate: 0.30, label: "Next 9,00,000" },
+                    { amount: Infinity, rate: 0.36, label: "Above 20,00,000" }
+                ]
+            };
+            
+            function handleFormSubmit(event) {
+                event.preventDefault();
+                
+                // 1. Get User Inputs
+                const inputs = getInputs();
+
+                // 2. Perform Calculations
+                const results = calculateTax(inputs);
+
+                // 3. Display Results
+                displayResults(results);
+            }
+
+            function getInputs() {
+                const getVal = (id) => parseFloat(document.getElementById(id).value) || 0;
+                const getPeriod = (name) => document.querySelector(`input[name="${name}"]:checked`).value;
+
+                return {
+                    maritalStatus: document.getElementById('marital-status').value,
+                    monthlySalary: getVal('monthly-salary'),
+                    annualBonus: getVal('annual-bonus'),
+                    pfContribution: getVal('pf-contribution'),
+                    pfPeriod: getPeriod('pf-period'),
+                    citContribution: getVal('cit-contribution'),
+                    citPeriod: getPeriod('cit-period'),
+                    ssfContribution: getVal('ssf-contribution'),
+                    ssfPeriod: getPeriod('ssf-period'),
+                    lifeInsurance: getVal('life-insurance'),
+                    medicalInsurance: getVal('medical-insurance'),
+                    otherDeductions: getVal('other-deductions')
+                };
+            }
+
+            function calculateTax(inputs) {
+                // Gross Income
+                const annualSalary = inputs.monthlySalary * 12;
+                const grossAnnualIncome = annualSalary + inputs.annualBonus;
+                
+                // Retirement Fund Calculation
+                const getAnnualContribution = (amount, period) => period === 'monthly' ? amount * 12 : amount;
+                const annualPF = getAnnualContribution(inputs.pfContribution, inputs.pfPeriod);
+                const annualCIT = getAnnualContribution(inputs.citContribution, inputs.citPeriod);
+                const annualSSF = getAnnualContribution(inputs.ssfContribution, inputs.ssfPeriod);
+                const totalRetirementContribution = annualPF + annualCIT + annualSSF;
+                
+                // Exemption Calculation
+                const retirementExemption = Math.min(
+                    totalRetirementContribution,
+                    grossAnnualIncome / 3,
+                    CONSTANTS.MAX_RETIREMENT_DEDUCTION
+                );
+                const lifeInsuranceExemption = Math.min(inputs.lifeInsurance, CONSTANTS.MAX_LIFE_INSURANCE_DEDUCTION);
+                const medicalInsuranceExemption = Math.min(inputs.medicalInsurance, CONSTANTS.MAX_MEDICAL_INSURANCE_DEDUCTION);
+                
+                const totalExemptions = retirementExemption + lifeInsuranceExemption + medicalInsuranceExemption + inputs.otherDeductions;
+                
+                // Taxable Income
+                const taxableIncome = Math.max(0, grossAnnualIncome - totalExemptions);
+
+                // Tax Calculation
+                const slabs = inputs.maritalStatus === 'single' ? CONSTANTS.SLABS_SINGLE : CONSTANTS.SLABS_MARRIED;
+                let remainingIncome = taxableIncome;
+                let totalTax = 0;
+                const taxBreakdown = [];
+
+                for (const slab of slabs) {
+                    if (remainingIncome <= 0) break;
+                    
+                    const taxableInSlab = Math.min(remainingIncome, slab.amount);
+                    const taxInSlab = taxableInSlab * slab.rate;
+                    
+                    totalTax += taxInSlab;
+                    remainingIncome -= taxableInSlab;
+                    
+                    if (taxableInSlab > 0) {
+                        taxBreakdown.push({
+                            label: slab.label,
+                            amount: taxableInSlab,
+                            rate: slab.rate * 100,
+                            tax: taxInSlab
+                        });
+                    }
+                }
+                
+                // Suggestions
+                const suggestions = [];
+                const remainingRetirement = CONSTANTS.MAX_RETIREMENT_DEDUCTION - retirementExemption;
+                if (remainingRetirement > 0) {
+                    suggestions.push(`You can contribute NPR ${formatNPR(remainingRetirement)} more to retirement funds (PF, CIT, SSF) to maximize tax savings.`);
+                }
+                const remainingLifeInsurance = CONSTANTS.MAX_LIFE_INSURANCE_DEDUCTION - lifeInsuranceExemption;
+                 if (remainingLifeInsurance > 0) {
+                    suggestions.push(`You can claim up to NPR ${formatNPR(remainingLifeInsurance)} more on Life Insurance premiums.`);
+                }
+                const remainingMedicalInsurance = CONSTANTS.MAX_MEDICAL_INSURANCE_DEDUCTION - medicalInsuranceExemption;
+                 if (remainingMedicalInsurance > 0) {
+                    suggestions.push(`You can claim up to NPR ${formatNPR(remainingMedicalInsurance)} more on Medical Insurance premiums.`);
+                }
+                if (suggestions.length === 0) {
+                    suggestions.push("You're doing a great job at maximizing your tax exemptions!");
+                }
+
+                return {
+                    grossAnnualIncome,
+                    totalExemptions,
+                    taxableIncome,
+                    totalTax,
+                    taxBreakdown,
+                    suggestions
+                };
+            }
+
+            function displayResults(results) {
+                const resultsSection = document.getElementById('results');
+
+                // Populate summary
+                document.getElementById('summary-gross-income').textContent = `NPR ${formatNPR(results.grossAnnualIncome)}`;
+                document.getElementById('summary-total-exemptions').textContent = `NPR ${formatNPR(results.totalExemptions)}`;
+                document.getElementById('summary-taxable-income').textContent = `NPR ${formatNPR(results.taxableIncome)}`;
+                document.getElementById('summary-total-tax').textContent = `NPR ${formatNPR(results.totalTax)}`;
+
+                // Populate breakdown table
+                const breakdownBody = document.getElementById('breakdown-body');
+                breakdownBody.innerHTML = '';
+                results.taxBreakdown.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.label}</td>
+                        <td style="text-align: right;">${formatNPR(item.amount)}</td>
+                        <td>${item.rate.toFixed(2)}%</td>
+                        <td style="text-align: right;">${formatNPR(item.tax)}</td>
+                    `;
+                    breakdownBody.appendChild(row);
+                });
+                
+                // Populate suggestions
+                const suggestionsList = document.getElementById('suggestions-list');
+                suggestionsList.innerHTML = '';
+                results.suggestions.forEach(text => {
+                   const li = document.createElement('li');
+                   li.textContent = text;
+                   suggestionsList.appendChild(li);
+                });
+
+                // Show results with animation
+                resultsSection.classList.add('visible');
+                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            function formatNPR(number) {
+                return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }).format(number);
+            }
+        });
+    </script>
+</body>
+</html>
