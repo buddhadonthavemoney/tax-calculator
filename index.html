@@ -186,8 +186,8 @@
         }
 
         .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            display: flex;
+            flex-wrap: wrap;
             gap: 1.25rem;
             margin-bottom: 2.5rem;
         }
@@ -199,6 +199,7 @@
             text-align: center;
             border: 1px solid var(--border-color);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
+            flex: 1 1 160px;
         }
         .summary-card:hover {
              transform: translateY(-4px);
@@ -210,13 +211,13 @@
             color: var(--text-light-color);
             font-weight: 500;
             margin-bottom: 0.5rem;
+            white-space: nowrap; /* --- THIS IS THE FIX --- */
         }
         
         .summary-card p {
-            font-size: clamp(1.2rem, 4vw, 1.5rem);
+            font-size: clamp(1.1rem, 4vw, 1.4rem);
             font-weight: 600;
             color: var(--text-color);
-            white-space: nowrap;
         }
         
         h2 {
@@ -369,21 +370,11 @@
             font-weight: 600;
         }
         
-        /* --- RESPONSIVE FIXES --- */
         @media (max-width: 768px) {
             body { padding: 1rem; }
             .container { padding: 1.5rem; }
             .form-grid { grid-template-columns: 1fr; gap: 1rem; }
             header h1 { font-size: 1.75rem; }
-            .summary-grid { 
-                grid-template-columns: 1fr 1fr; /* 2 columns for tablets/large phones */
-            }
-        }
-
-        @media (max-width: 480px) {
-            .summary-grid {
-                 grid-template-columns: 1fr; /* 1 column for small phones */
-            }
         }
     </style>
 
@@ -533,10 +524,6 @@
                 </div>
             </div>
 
-            <div id="suggestions">
-                <h2>Tax Optimization Suggestions</h2>
-                <ul id="suggestions-list"></ul>
-            </div>
             <div>
                 <h2>Tax Slab Breakdown</h2>
                 <div class="table-wrapper">
@@ -554,6 +541,10 @@
                 </div>
             </div>
 
+            <div id="suggestions">
+                <h2>Tax Optimization Suggestions</h2>
+                <ul id="suggestions-list"></ul>
+            </div>
         </section>
 
         <section id="info-section">
@@ -657,7 +648,6 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             
-            // --- CHANGE 1: Select all inputs for real-time updates ---
             const allInputs = document.querySelectorAll('#tax-form input, #tax-form select');
 
             // TAX CONSTANTS for FY 2081/82
@@ -681,17 +671,18 @@
                 ]
             };
             
-            // --- CHANGE 2: Create a single function to run on any input change ---
             function runCalculation() {
                 const inputs = getInputs();
                 const results = calculateTax(inputs);
                 displayResults(results);
             }
 
-            // --- CHANGE 3: Attach the event listener to every form element ---
             allInputs.forEach(input => {
                 input.addEventListener('input', runCalculation);
             });
+            
+            // Run calculation on page load in case of saved form values
+            runCalculation();
 
             function getInputs() {
                 const getVal = (id) => parseFloat(document.getElementById(id).value) || 0;
@@ -902,7 +893,6 @@
 
                 // Show results with animation
                 resultsSection.classList.add('visible');
-                // --- CHANGE 4: Removed the scrollIntoView() function ---
             }
 
             function formatNPR(number) {
