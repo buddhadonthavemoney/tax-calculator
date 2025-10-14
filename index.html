@@ -7,7 +7,6 @@
     <title>Nepal Income Tax Calculator | FY 2081/82 (2024/25)</title>
 
     <meta name="description" content="Calculate your annual income tax in Nepal for the fiscal year 2081/82 (2024/25). A simple, free tool to understand your tax liability and net monthly salary.">
-
     <meta name="keywords" content="nepal income tax calculator, tax calculator nepal, income tax nepal, fy 2081/82, tax slabs nepal, provident fund, cit, ssf, tax exemptions, net salary nepal">
 
     <link rel="canonical" href="https://tax.buddhag.com.np/">
@@ -530,16 +529,24 @@
                     <p id="summary-gross-income">NPR 0</p>
                 </div>
                 <div class="summary-card">
-                    <h3>Total Annual Tax</h3>
-                    <p id="summary-total-tax">NPR 0</p>
+                    <h3>Annual In-Hand</h3>
+                    <p id="summary-net-annual-salary">NPR 0</p>
                 </div>
                 <div class="summary-card">
                     <h3>Monthly In-Hand</h3>
                     <p id="summary-net-salary">NPR 0</p>
                 </div>
                 <div class="summary-card">
-                    <h3>Annual In-Hand</h3>
-                    <p id="summary-net-annual-salary">NPR 0</p>
+                    <h3>Total Annual Tax</h3>
+                    <p id="summary-total-tax">NPR 0</p>
+                </div>
+                <div class="summary-card">
+                    <h3>Monthly Tax</h3>
+                    <p id="summary-monthly-tax">NPR 0</p>
+                </div>
+                <div class="summary-card">
+                    <h3>Monthly Contributions</h3>
+                    <p id="summary-monthly-contribution">NPR 0</p>
                 </div>
                  <div class="summary-card">
                     <h3>Total Exemptions</h3>
@@ -778,11 +785,15 @@
                 // Net Salary Calculation
                 const monthlyTax = totalTax / 12;
                 const getMonthlyContribution = (amount, period) => period === 'monthly' ? amount : amount / 12;
+
                 const monthlyPF = getMonthlyContribution(inputs.pfContribution, inputs.pfPeriod);
                 const monthlyCIT = getMonthlyContribution(inputs.citContribution, inputs.citPeriod);
                 const monthlySSF = getMonthlyContribution(inputs.ssfContribution, inputs.ssfPeriod);
+                const monthlyInsurance = (inputs.lifeInsurance + inputs.medicalInsurance) / 12;
                 
-                const netMonthlySalary = inputs.monthlySalary - monthlyTax - monthlyPF - monthlyCIT - monthlySSF;
+                const monthlyContributions = monthlyPF + monthlyCIT + monthlySSF + monthlyInsurance;
+
+                const netMonthlySalary = inputs.monthlySalary - monthlyTax - monthlyContributions;
                 const netAnnualSalary = netMonthlySalary * 12 + inputs.annualBonus; // Net salary + bonus
 
                 // Suggestions
@@ -848,6 +859,7 @@
                     taxableIncome,
                     totalTax,
                     monthlyTax: totalTax / 12,
+                    monthlyContributions,
                     netMonthlySalary,
                     netAnnualSalary, 
                     taxBreakdown,
@@ -863,6 +875,8 @@
                 document.getElementById('summary-total-exemptions').innerHTML = `NPR&nbsp;${formatNPR(results.totalExemptions)}`;
                 document.getElementById('summary-taxable-income').innerHTML = `NPR&nbsp;${formatNPR(results.taxableIncome)}`;
                 document.getElementById('summary-total-tax').innerHTML = `NPR&nbsp;${formatNPR(results.totalTax)}`;
+                document.getElementById('summary-monthly-tax').innerHTML = `NPR&nbsp;${formatNPR(results.monthlyTax)}`;
+                document.getElementById('summary-monthly-contribution').innerHTML = `NPR&nbsp;${formatNPR(results.monthlyContributions)}`;
                 document.getElementById('summary-net-salary').innerHTML = `NPR&nbsp;${formatNPR(results.netMonthlySalary)}`;
                 document.getElementById('summary-net-annual-salary').innerHTML = `NPR&nbsp;${formatNPR(results.netAnnualSalary)}`;
 
@@ -881,7 +895,7 @@
                     breakdownBody.appendChild(row);
                 });
                 
-                // === ADDED: TOTAL ROW FOR BREAKDOWN TABLE ===
+                // Add total row for breakdown table
                 if (results.totalTax > 0) {
                     const totalRow = document.createElement('tr');
                     totalRow.style.fontWeight = 'bold';
