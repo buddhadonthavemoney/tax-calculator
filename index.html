@@ -881,6 +881,18 @@
                     breakdownBody.appendChild(row);
                 });
                 
+                // === ADDED: TOTAL ROW FOR BREAKDOWN TABLE ===
+                if (results.totalTax > 0) {
+                    const totalRow = document.createElement('tr');
+                    totalRow.style.fontWeight = 'bold';
+                    totalRow.style.backgroundColor = 'var(--bg-color)';
+                    totalRow.innerHTML = `
+                        <td colspan="3" style="text-align: right; padding-right: 1rem;">Total Annual Tax</td>
+                        <td>${formatNPR(results.totalTax)}</td>
+                    `;
+                    breakdownBody.appendChild(totalRow);
+                }
+                
                 // Populate suggestions
                 const suggestionsList = document.getElementById('suggestions-list');
                 suggestionsList.innerHTML = '';
