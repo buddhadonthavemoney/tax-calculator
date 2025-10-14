@@ -6,7 +6,7 @@
     
     <title>Nepal Income Tax Calculator | FY 2081/82 (2024/25)</title>
 
-    <meta name="description" content="Calculate your annual income tax in Nepal for the fiscal year 2081/82 (2024/25). A simple, free tool to understand your tax liability and net monthly salary.">
+    <meta name="description" content="Calculate your annual income tax in Nepal for the fiscal year 2081/82 (2024/25). A simple, free, real-time tool to understand your tax liability and net monthly salary.">
 
     <meta name="keywords" content="nepal income tax calculator, tax calculator nepal, income tax nepal, fy 2081/82, tax slabs nepal, provident fund, cit, ssf, tax exemptions, net salary nepal">
 
@@ -168,28 +168,6 @@
             background-color: var(--primary-color);
             color: white;
             font-weight: 500;
-        }
-
-        .calculate-btn {
-            grid-column: 1 / -1;
-            padding: 1rem;
-            background-image: linear-gradient(to right, var(--primary-color) 0%, var(--secondary-color) 100%);
-            color: white;
-            border: none;
-            border-radius: var(--border-radius);
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 1.5rem;
-            letter-spacing: 0.5px;
-            background-size: 200% auto;
-        }
-
-        .calculate-btn:hover {
-            background-position: right center;
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px -10px var(--primary-color);
         }
 
         #results {
@@ -407,8 +385,6 @@
                  grid-template-columns: 1fr; /* 1 column for small phones */
             }
         }
-
-
     </style>
 
     <script type="application/ld+json">
@@ -519,8 +495,6 @@
                 <label for="other-deductions">Other Deductions (Annual)</label>
                 <input type="number" id="other-deductions" placeholder="0" min="0">
             </div>
-            
-            <button type="submit" class="calculate-btn">Calculate My Tax</button>
         </form>
 
         <section id="results">
@@ -530,16 +504,24 @@
                     <p id="summary-gross-income">NPR 0</p>
                 </div>
                 <div class="summary-card">
-                    <h3>Total Annual Tax</h3>
-                    <p id="summary-total-tax">NPR 0</p>
+                    <h3>Annual In-Hand</h3>
+                    <p id="summary-net-annual-salary">NPR 0</p>
                 </div>
                 <div class="summary-card">
                     <h3>Monthly In-Hand</h3>
                     <p id="summary-net-salary">NPR 0</p>
                 </div>
                 <div class="summary-card">
-                    <h3>Annual In-Hand</h3>
-                    <p id="summary-net-annual-salary">NPR 0</p>
+                    <h3>Total Annual Tax</h3>
+                    <p id="summary-total-tax">NPR 0</p>
+                </div>
+                <div class="summary-card">
+                    <h3>Monthly Tax</h3>
+                    <p id="summary-monthly-tax">NPR 0</p>
+                </div>
+                <div class="summary-card">
+                    <h3>Monthly Contributions</h3>
+                    <p id="summary-monthly-contribution">NPR 0</p>
                 </div>
                  <div class="summary-card">
                     <h3>Total Exemptions</h3>
@@ -551,6 +533,10 @@
                 </div>
             </div>
 
+            <div id="suggestions">
+                <h2>Tax Optimization Suggestions</h2>
+                <ul id="suggestions-list"></ul>
+            </div>
             <div>
                 <h2>Tax Slab Breakdown</h2>
                 <div class="table-wrapper">
@@ -568,10 +554,6 @@
                 </div>
             </div>
 
-            <div id="suggestions">
-                <h2>Tax Optimization Suggestions</h2>
-                <ul id="suggestions-list"></ul>
-            </div>
         </section>
 
         <section id="info-section">
@@ -674,8 +656,9 @@
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const form = document.getElementById('tax-form');
-            form.addEventListener('submit', handleFormSubmit);
+            
+            // --- CHANGE 1: Select all inputs for real-time updates ---
+            const allInputs = document.querySelectorAll('#tax-form input, #tax-form select');
 
             // TAX CONSTANTS for FY 2081/82
             const CONSTANTS = {
@@ -698,12 +681,17 @@
                 ]
             };
             
-            function handleFormSubmit(event) {
-                event.preventDefault();
+            // --- CHANGE 2: Create a single function to run on any input change ---
+            function runCalculation() {
                 const inputs = getInputs();
                 const results = calculateTax(inputs);
                 displayResults(results);
             }
+
+            // --- CHANGE 3: Attach the event listener to every form element ---
+            allInputs.forEach(input => {
+                input.addEventListener('input', runCalculation);
+            });
 
             function getInputs() {
                 const getVal = (id) => parseFloat(document.getElementById(id).value) || 0;
@@ -778,12 +766,16 @@
                 // Net Salary Calculation
                 const monthlyTax = totalTax / 12;
                 const getMonthlyContribution = (amount, period) => period === 'monthly' ? amount : amount / 12;
+
                 const monthlyPF = getMonthlyContribution(inputs.pfContribution, inputs.pfPeriod);
                 const monthlyCIT = getMonthlyContribution(inputs.citContribution, inputs.citPeriod);
                 const monthlySSF = getMonthlyContribution(inputs.ssfContribution, inputs.ssfPeriod);
+                const monthlyInsurance = (inputs.lifeInsurance + inputs.medicalInsurance) / 12;
                 
-                const netMonthlySalary = inputs.monthlySalary - monthlyTax - monthlyPF - monthlyCIT - monthlySSF;
-                const netAnnualSalary = netMonthlySalary * 12 + inputs.annualBonus; // Net salary + bonus
+                const monthlyContributions = monthlyPF + monthlyCIT + monthlySSF + monthlyInsurance;
+                
+                const netMonthlySalary = inputs.monthlySalary - monthlyTax - monthlyContributions;
+                const netAnnualSalary = netMonthlySalary * 12 + inputs.annualBonus;
 
                 // Suggestions
                 const suggestions = [];
@@ -848,6 +840,7 @@
                     taxableIncome,
                     totalTax,
                     monthlyTax: totalTax / 12,
+                    monthlyContributions,
                     netMonthlySalary,
                     netAnnualSalary, 
                     taxBreakdown,
@@ -863,6 +856,8 @@
                 document.getElementById('summary-total-exemptions').innerHTML = `NPR&nbsp;${formatNPR(results.totalExemptions)}`;
                 document.getElementById('summary-taxable-income').innerHTML = `NPR&nbsp;${formatNPR(results.taxableIncome)}`;
                 document.getElementById('summary-total-tax').innerHTML = `NPR&nbsp;${formatNPR(results.totalTax)}`;
+                document.getElementById('summary-monthly-tax').innerHTML = `NPR&nbsp;${formatNPR(results.monthlyTax)}`;
+                document.getElementById('summary-monthly-contribution').innerHTML = `NPR&nbsp;${formatNPR(results.monthlyContributions)}`;
                 document.getElementById('summary-net-salary').innerHTML = `NPR&nbsp;${formatNPR(results.netMonthlySalary)}`;
                 document.getElementById('summary-net-annual-salary').innerHTML = `NPR&nbsp;${formatNPR(results.netAnnualSalary)}`;
 
@@ -881,7 +876,7 @@
                     breakdownBody.appendChild(row);
                 });
                 
-                // === ADDED: TOTAL ROW FOR BREAKDOWN TABLE ===
+                // Add total row for breakdown table
                 if (results.totalTax > 0) {
                     const totalRow = document.createElement('tr');
                     totalRow.style.fontWeight = 'bold';
@@ -907,7 +902,7 @@
 
                 // Show results with animation
                 resultsSection.classList.add('visible');
-                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // --- CHANGE 4: Removed the scrollIntoView() function ---
             }
 
             function formatNPR(number) {
